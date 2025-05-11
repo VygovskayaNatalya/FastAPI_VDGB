@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+Pillow
+Jinja2
+gdown
+python-multipart
