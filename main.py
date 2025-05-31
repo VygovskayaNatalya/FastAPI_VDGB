@@ -1,5 +1,6 @@
 ''' Этот код демонстрирует базовую структуру приложения FastAPI для машинного обучения и веб-разработки.
-    Он включает импорт необходимых библиотек и фреймворков, а также настройку приложения.'''
+    Он включает импорт необходимых библиотек и фреймворков, а также настройку приложения.
+    Код не дописан для модели'''
 
 from fastapi import FastAPI, Request, File, UploadFile
 from fastapi.responses import HTMLResponse
@@ -21,7 +22,7 @@ from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="D:/Lesson_FastAPI_DIPLOM/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -35,16 +36,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Model initialization
-model = models.resnet50(pretrained=False)
-num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, 3)
-model.load_state_dict(torch.load('resnet50_model.pth', map_location=torch.device('cpu'), weights_only=True))
-model.eval()
 
-class_names = ['NORMAL', 'SCOLIOSIS', 'SPONDYLOLISTHESIS']
+# Заглушка:
+model = None  # Заглушка для yolo11s-seg.pt
+print("Заглушка YOLO11_seg: модель yolo11s-seg.pt будет подключена позже")
+
+class_names = ['class_0', 'class_1', 'class_2']  # Заглушка классов
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = model.to(device)
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),

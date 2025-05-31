@@ -5,14 +5,17 @@
 	<link rel="stylesheet" href="static/style.css">
 
 	<style>
-		#file_upload_form{
-		position: relative;
-		width: 30%;
-		height: 150px;
-		border: 3px dashed grey;
-		border-radius: 10px;
-		z-index:99;
-		margin: auto;
+		#file_upload_form {
+			position: relative;
+			width: 30%;
+			height: 150px;
+			border: 3px dashed #A52A2A; /* Бордовая граница */
+			border-radius: 10px;
+			z-index:99;
+			margin: 10px auto;
+			transform: translateY(10px); /* Сдвигает вниз на 10px */
+			background-color: rgba(139, 0, 0, 0.05); /* Легкий красный фон */
+	
 		}
 		
 		#drag_drop_area{
@@ -44,37 +47,61 @@
 		opacity: 0;
 		}
 		.form button {
-			border-radius: 10px;
-			padding: 10px 20px;
-			background: #1950A3;
-			outline: none;
-			border: none;
-			color: white;
-			font-size: 16px;
-		}
-		.mx-2 {
-			position: relative;
-			top: 30px;
-			left: -10px;
-		}
-		#fileName::before {
-			content: 'File Name:';
-		}
-		#fileName {
-			position: relative;
-			top: 10px;
-			color: #eee;
-			text-align:center;
-		}
-		#image-container, #button-container, #result{
-			margin-top: 20px;
-			text-align: center;
-			z-index: 999;
-			position: relative;
-			color: red;
-			font-size: 24px; /* Увеличенный размер шрифта */
-		}
-		
+    border-radius: 10px;
+    padding: 10px 20px;
+    background: #A52A2A; /* Темно-красный */
+    outline: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
+}
+
+.form button:hover {
+    background: #A52A2A; /* Бордовый при наведении */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(165, 42, 42, 0.3);
+}
+
+.form button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2);
+}
+.form button:after {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 8px;
+    background: url('data:image/svg+xml;utf8,<svg>...параллелограммы...</svg>');
+}
+
+#drag_drop_area {
+    height: 150px;
+    color: #bbb;
+    text-align: center;
+    background-color: rgba(139, 0, 0, 0.05); /* Легкий красный фон */
+    border: 3px dashed #A52A2A; /* Бордовая граница */
+}
+
+
+
+#recognize-btn::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255,255,255,0.1);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+}
+
+#recognize-btn:hover::after {
+    left: 100%;
+} */
 
 	</style>
 </head>
@@ -83,9 +110,16 @@
 	<form id="file_upload_form" action="/uploadfile/" method="post" enctype="multipart/form-data">
 		<div id="drag_drop_area" class="form">
 			<img src="static/upload.png" alt="upload" width="15%" class="mx-2">
-            Upload your files here or 
+            Загрузите сюда ваш файл
 			<input name="file" id="entry_value" ref="fileInput" type="file" style="display:none;" onchange="getFileName()">           
-			<button type="button" class="btn bg-color-dblue btn-primary px-4 py-3" onclick="document.getElementById('entry_value').click();">Browse</button>
+			<!-- <button type="button" class="btn bg-color-dblue btn-primary px-4 py-3" onclick="document.getElementById('entry_value').click();"> ВЫБРАТЬ</button> -->
+			<button 
+			type="button" 
+			class="btn bg-color-dblue btn-primary px-4 py-3" 
+			onclick="document.getElementById('entry_value').click();" 
+			style="text-align: center;">
+			ВЫБРАТЬ
+		</button>
 		</div>
 	</form>
 	<div id="fileName" class="text-primary ">        </div>
@@ -108,35 +142,84 @@
 			getFileName();
 		});
 		
+		
 		function getFileName() {
-			var x = document.getElementById('entry_value')
-			document.getElementById('fileName').innerHTML = x.value.split('\\').pop()
-			const fileInput = document.getElementById("entry_value");
-			const file = fileInput.files[0];
-			const img_container = document.getElementById("image-container");
-			const btn_container = document.getElementById("button-container");
-			if (file.type.startsWith("image/")) {
-				const reader = new FileReader();
-				reader.onload = function(event) {
-					const img = new Image();
-					img.src = event.target.result;              
-					img.width = 300;
-					img.height = 200;
-					img.setAttribute('id', 'predict-img');
-					const button = document.createElement('button');
-					button.setAttribute('id', 'predict-button');
-					button.textContent = 'ОПРЕДЕЛИТЬ ДИАГНОЗ';
-					img_container.innerHTML = '';
-					btn_container.innerHTML = '';
-					img_container.appendChild(img);
-					btn_container.appendChild(button);
-					addListener();
-				};
-				reader.readAsDataURL(file);
-			} else {
-				img_container.innerHTML = 'Не поддерживаемый формат изображения';
-			}          
-		}
+    const x = document.getElementById('entry_value');
+    document.getElementById('fileName').textContent = x.value.split('\\').pop();
+    
+    const file = x.files[0];
+    const img_container = document.getElementById("image-container");
+    const btn_container = document.getElementById("button-container");
+    
+    if (!file) return;
+
+    if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            // Создаем изображение
+            const img = new Image();
+            img.src = event.target.result;              
+            img.width = 300;
+            img.height = 200;
+            img.style.borderRadius = '8px';
+            img.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            img.setAttribute('id', 'predict-img');
+            
+            // Создаем кнопку с CSS-стилями
+            const button = document.createElement('button');
+            button.setAttribute('id', 'predict-button');
+            button.textContent = 'РАСПОЗНАТЬ';
+		            
+            // Добавляем стили для кнопки
+            Object.assign(button.style, {
+                background: 'linear-gradient(135deg, #A52A2A 0%, #A52A2A 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '12px 32px',
+                fontSize: '16px',
+                // fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(227, 25, 55, 0.4)',
+                transition: 'all 0.3s ease',
+                textTransform: 'uppercase',
+                marginTop: '20px',
+				marginLeft:'20px'
+            });
+            
+            // Добавляем обработчики событий для hover/active
+            button.addEventListener('mouseenter', () => {
+                button.style.transform = 'translateY(-2px)';
+                button.style.boxShadow = '0 6px 16px rgba(227, 25, 55, 0.6)';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = '';
+                button.style.boxShadow = '0 4px 12px rgba(227, 25, 55, 0.4)';
+            });
+            
+            button.addEventListener('mousedown', () => {
+                button.style.background = 'linear-gradient(135deg, #9B1A2B 0%, #5C0E1A 100%)';
+            });
+			button.addEventListener('mouseup', () => {
+    button.style.background = 'linear-gradient(135deg, rgba(227, 25, 55, 0.8) 0%, rgba(139, 0, 0, 0.6) 50%, rgba(165, 42, 42, 0.4) 100%)';
+});
+            
+            // Очищаем контейнеры и добавляем элементы
+            img_container.innerHTML = '';
+            btn_container.innerHTML = '';
+            img_container.appendChild(img);
+            btn_container.appendChild(button);
+            
+            addListener();
+        };
+        
+        reader.readAsDataURL(file);
+    } else {
+        img_container.innerHTML = '<p style="color: #E31937; font-weight: bold;">Не поддерживаемый формат файла</p>';
+    }          
+}
 		
 		function addListener() {      
 			document.getElementById('predict-button').addEventListener('click', () => {    
@@ -153,15 +236,15 @@
 				.then((data) => {
 					const resultDiv = document.getElementById("result");
 					resultDiv.innerHTML = `
-						<p>Предсказанный класс: ${data.predicted_class}</p>
-						<p>Вероятность: ${data.predicted_probability}</p>
+						<p>Ведомость загружена в EXCEL-файл</p>
+						<p>	Файл доступен по ссылке	</p>
 					`;
 					
 					// Отображение изображения
 					const img = new Image();
 					img.src = URL.createObjectURL(file);
 					img.width = 800;
-					img.height = 600;
+					img.height = 800;
 					resultDiv.appendChild(img);
 				})
 				.catch((error) => {

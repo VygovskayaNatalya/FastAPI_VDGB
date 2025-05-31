@@ -4,16 +4,6 @@
   box-sizing: border-box;
 }
 
-/*
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background: #0c0c0c;
-}
-*/
-
 a {
   position: relative;
   padding: 20px 50px;
@@ -34,18 +24,19 @@ a span {
   z-index: 1;
 }
 
+/* Основной стиль кнопки (тёмно-красный) */
 a .liquid {
   position: absolute;
   top: -80px;
   left: 0;
   width: 200px;
   height: 200px;
-  background: #4973ff;
-  box-shadow: inset 0 0 50px rgba(0, 0, 0, .5);
+  background: #8B0000; /* Тёмно-красный (DarkRed) */
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.7);
   transition: .5s;
 }
 
-a .liquid::after,
+/* Тёмно-красные волны */
 a .liquid::before {
   content: '';
   width: 200%;
@@ -54,7 +45,28 @@ a .liquid::before {
   top: 0;
   left: 50%;
   transform: translate(-50%, -75%);
-  background: #000;
+  border-radius: 45%;
+  background: rgba(80, 0, 0, 0.9); /* Глубокий тёмно-красный */
+  animation: animate 5s linear infinite;
+}
+
+a .liquid::after {
+  content: '';
+  width: 200%;
+  height: 200%;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -75%);
+  border-radius: 40%;
+  background: rgba(120, 0, 0, 0.5); /* Полупрозрачный бордовый */
+  animation: animate 10s linear infinite;
+}
+
+/* Эффект при наведении (светлее) */
+a:hover .liquid {
+  top: -120px;
+  background: #B22222; /* FireBrick (ярче при наведении) */
 }
 
 a .liquid::before {
@@ -83,12 +95,22 @@ a:hover .liquid{
     transform: translate(-50%, -75%) rotate(360deg);
   }
 }
-
 body {
-	background-image: url("back2.jpeg");
+  background-image: url("Picture_VDGB.png");
+  background-size: contain; /* Изменено с 'cover' на 'contain' */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed; /* Фиксирует изображение при прокрутке */
+  margin: 0;
+  min-height: 100vh; /* Гарантирует заполнение всего экрана */
+}
+
+/* body {
+	background-image: url("Picture_VDGB.png");
 	background-size: cover;
 	background-repeat: no-repeat;
-}
+	background-position: center;
+	} */
 #header {
 	display: flex;
 	align-items: center;
@@ -156,40 +178,4 @@ body {
 	position: absolute;
 	top: 0px;
 	left: 0;
-}
-
-.buttons-mnist {
-  font-size: 1.5rem;
-  padding: 0.5rem 2rem;
-  margin: 0 20px;
-  color: #000;
-  text-transform: uppercase;
-  text-decoration: none;
-  border: 1px solid rgb(146, 148, 248);
-  position: relative;
-  overflow: hidden;
-}
-
-.buttons-mnist:hover {
-  box-shadow: 1px 1px 25px 10px rgba(146, 148, 248, 0.4);
-}
-
-.buttons-mnist:before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-	120deg,
-	transparent,
-	rgba(146, 148, 248, 0.4),
-	transparent
-  );
-  transition: all 650ms;
-}
-
-.buttons-mnist:hover:before {
-  left: 100%;
 }
